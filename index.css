@@ -1,0 +1,662 @@
+/* ===================================================
+   🎨 옵시디언 스타일 마인드맵 - 디자인 시스템
+   집의 기초공사(foundation)에 해당하는 파일!
+   여기서 색상, 폰트, 레이아웃 등 모든 디자인 변수를 정의해요.
+   =================================================== */
+
+/* ---- Wanted Sans 웹폰트 불러오기 ---- */
+@import url('https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.1/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css');
+
+/* ---- 전체 디자인 변수 (수학의 상수처럼, 여기서 한 번만 정의!) ---- */
+:root {
+  /* 배경 색상 (옵시디언 다크 테마 계열) */
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-sidebar: rgba(22, 27, 34, 0.85);
+  --bg-input: rgba(30, 38, 50, 0.9);
+  --bg-card: rgba(30, 38, 50, 0.6);
+
+  /* 텍스트 색상 */
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #484f58;
+
+  /* 강조 색상 (보라-파랑 그라데이션 계열) */
+  --accent-purple: #a855f7;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-pink: #ec4899;
+  --accent-glow: rgba(168, 85, 247, 0.3);
+
+  /* 테두리 */
+  --border-default: rgba(48, 54, 61, 0.7);
+  --border-focus: rgba(168, 85, 247, 0.6);
+
+  /* 그림자 */
+  --shadow-glow: 0 0 20px rgba(168, 85, 247, 0.15);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+
+  /* 폰트 */
+  --font-main: 'Wanted Sans Variable', 'Wanted Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* 레이아웃 크기 */
+  --header-height: 64px;
+  --sidebar-width: 300px;
+
+  /* 애니메이션 */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 0.15s var(--ease-out-expo);
+  --transition-normal: 0.3s var(--ease-out-expo);
+}
+
+/* ---- 기본 리셋 (깨끗한 도화지 만들기) ---- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-main);
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  /* 부드러운 폰트 렌더링 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- 전체 레이아웃 (CSS Grid로 3분할) ---- */
+/* 수학 좌표평면처럼 영역을 나누는 거예요!
+   "header header"   → 상단 전체
+   "sidebar canvas"  → 좌: 사이드바, 우: 캔버스 */
+#app-container {
+  display: grid;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar canvas";
+  width: 100%;
+  height: 100vh;
+}
+
+/* ===================================================
+   📌 상단 헤더 (학번, 이름, 과목 입력)
+   =================================================== */
+.app-header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-default);
+  z-index: 10;
+}
+
+/* 로고 영역 */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.header-logo .material-symbols-rounded {
+  font-size: 24px;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 구분선 */
+.header-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border-default);
+  flex-shrink: 0;
+}
+
+/* 입력 필드 그룹 */
+.header-inputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-group input {
+  width: 140px;
+  padding: 6px 12px;
+  font-family: var(--font-main);
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input-group input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.input-group input::placeholder {
+  color: var(--text-muted);
+}
+
+/* 헤더 오른쪽 액션 버튼 */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ===================================================
+   📂 좌측 사이드바
+   옵시디언의 파일 탐색기처럼 생긴 영역!
+   =================================================== */
+.app-sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-default);
+  /* 글래스모피즘(유리 효과) */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow: hidden;
+}
+
+/* 사이드바 섹션 공통 스타일 */
+.sidebar-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.sidebar-section:last-child {
+  border-bottom: none;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 스크롤바 커스텀 (옵시디언 스타일) */
+.sidebar-section::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-section::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+.sidebar-section::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* 섹션 제목 */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.section-title .material-symbols-rounded {
+  font-size: 16px;
+}
+
+/* ---- 노드 추가 폼 ---- */
+.add-node-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-node-form input,
+.add-node-form select {
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--font-main);
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.add-node-form select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%238b949e'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+.add-node-form select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.add-node-form input:focus,
+.add-node-form select:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ---- 버튼 스타일 ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn .material-symbols-rounded {
+  font-size: 18px;
+}
+
+/* 기본 버튼 (보라색 그라데이션) */
+.btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* 보조 버튼 (반투명) */
+.btn-secondary {
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+}
+
+.btn-secondary:hover {
+  color: var(--text-primary);
+  background: rgba(48, 54, 61, 0.6);
+  border-color: var(--text-muted);
+}
+
+/* 위험 버튼 (빨간색) */
+.btn-danger {
+  color: #f85149;
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+}
+
+.btn-danger:hover {
+  background: rgba(248, 81, 73, 0.2);
+}
+
+/* 아이콘 전용 버튼 */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.btn-icon:hover {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border-color: var(--border-default);
+}
+
+/* 버튼 그룹 (가로 배치) */
+.btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+/* ---- 노드 트리 목록 ---- */
+.node-tree {
+  list-style: none;
+}
+
+.node-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.node-tree-item:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* 선택된 노드 항목 */
+.node-tree-item.active {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--accent-purple);
+}
+
+/* 노드 색상 표시 점 */
+.node-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 트리 들여쓰기 (수학의 계차수열처럼 레벨마다 깊어짐!) */
+.node-tree-item[data-depth="1"] { padding-left: 24px; }
+.node-tree-item[data-depth="2"] { padding-left: 40px; }
+.node-tree-item[data-depth="3"] { padding-left: 56px; }
+.node-tree-item[data-depth="4"] { padding-left: 72px; }
+
+/* 노드 아이콘 (Material Symbols) */
+.node-tree-item .material-symbols-rounded {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* 노드 이름 텍스트 */
+.node-tree-item .node-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- 노드 편집 패널 ---- */
+.edit-panel {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.edit-panel.visible {
+  display: flex;
+}
+
+.edit-panel .edit-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+/* 색상 선택기 */
+.color-picker-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch.active {
+  border-color: #fff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+/* ===================================================
+   🎨 메인 캔버스 영역
+   =================================================== */
+.app-canvas-wrapper {
+  grid-area: canvas;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+  /* 옵시디언 느낌의 미세한 도트 패턴 배경 */
+  background-image: radial-gradient(circle, rgba(139, 148, 158, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+#mindmap-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+#mindmap-canvas:active {
+  cursor: grabbing;
+}
+
+/* 캔버스 위에 떠 있는 컨트롤 (줌 버튼 등) */
+.canvas-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 5;
+}
+
+.canvas-controls .btn-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--bg-sidebar);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-card);
+}
+
+.canvas-controls .btn-icon:hover {
+  background: var(--bg-card);
+}
+
+/* 하단 도움말 바 */
+.canvas-help {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 20px;
+  background: var(--bg-sidebar);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  z-index: 5;
+  box-shadow: var(--shadow-card);
+}
+
+.canvas-help kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  font-family: var(--font-main);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+}
+
+.help-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ===================================================
+   ✨ 애니메이션 & 효과
+   =================================================== */
+
+/* 페이드 인 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 글로우 펄스 (선택된 노드용) */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px var(--accent-glow); }
+  50% { box-shadow: 0 0 20px var(--accent-glow); }
+}
+
+/* 사이드바 항목 진입 애니메이션 */
+.node-tree-item {
+  animation: fadeIn 0.2s var(--ease-out-expo) backwards;
+}
+
+/* 빈 상태 메시지 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-state .material-symbols-rounded {
+  font-size: 40px;
+  opacity: 0.4;
+}
+
+.empty-state p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* 토스트(알림) 메시지 */
+.toast {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--bg-sidebar);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  z-index: 100;
+  animation: slideInToast 0.3s var(--ease-out-expo), fadeOutToast 0.3s var(--ease-out-expo) 2s forwards;
+}
+
+@keyframes slideInToast {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeOutToast {
+  to { opacity: 0; transform: translateX(40px); }
+}
+
+/* ===================================================
+   📱 반응형 (모바일 대응, 수학 함수의 정의역 조절!)
+   =================================================== */
+@media (max-width: 768px) {
+  #app-container {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "canvas";
+  }
+
+  .app-sidebar {
+    display: none;
+  }
+
+  .header-inputs {
+    overflow-x: auto;
+  }
+
+  .input-group input {
+    width: 100px;
+  }
+}
