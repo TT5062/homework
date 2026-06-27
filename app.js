@@ -795,6 +795,96 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==============================================
+  // 11단계: 🔒 윤리 핵심가이드 게이트 제어 시스템
+  // 비유: 검문소의 열쇠(LocalStorage)를 확인하는 논리구조예요!
+  // ==============================================
+  const ethicsGate = document.getElementById('ethics-gate');
+  const btnEthicsAgree = document.getElementById('btn-ethics-agree');
+
+  // 로컬 스토리지에 동의 내역이 있는지 확인
+  const isEthicsApproved = localStorage.getItem('ethics-approved');
+
+  if (isEthicsApproved === 'true') {
+    // 이미 동의했다면 오버레이를 감춤
+    ethicsGate.classList.add('hidden');
+  }
+
+  // 동의 서약 버튼 클릭 이벤트 핸들러
+  btnEthicsAgree.addEventListener('click', () => {
+    // 로컬 스토리지에 서약 기록 저장 (영구 보관)
+    localStorage.setItem('ethics-approved', 'true');
+    
+    // 오버레이에 hidden 클래스를 넣어 슬라이드 아웃 애니메이션 실행
+    ethicsGate.classList.add('hidden');
+    
+    // 축하 메시지 띄우기
+    showToast('🚀 윤리 실천 약속 완료! 활동을 시작합니다.');
+  });
+
+  // ==============================================
+  // 12단계: 📄 이용약관 & 개인정보처리방침 모달 제어 시스템
+  // 비유: 탭을 누르면 해당 칠판(탭 화면)만 보여주는 시스템이에요!
+  // ==============================================
+  const termsModal = document.getElementById('terms-modal');
+  const linkTerms = document.getElementById('link-terms');
+  const linkPrivacy = document.getElementById('link-privacy');
+  const btnModalClose = document.getElementById('btn-modal-close');
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  // 모달 열기 함수
+  function openModal(activeTabId) {
+    termsModal.classList.add('visible');
+    switchTab(activeTabId);
+  }
+
+  // 모달 닫기 함수
+  function closeModal() {
+    termsModal.classList.remove('visible');
+  }
+
+  // 탭 전환 함수
+  function switchTab(tabId) {
+    // 탭 버튼 활성화 상태 조절
+    tabButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+
+    // 탭 내용 활성화 상태 조절
+    tabContents.forEach(content => {
+      content.classList.toggle('active', content.id === tabId);
+    });
+  }
+
+  // 푸터 링크 클릭 시 모달 열기
+  linkTerms.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal('tab-terms');
+  });
+
+  linkPrivacy.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal('tab-privacy');
+  });
+
+  // 닫기 버튼 클릭
+  btnModalClose.addEventListener('click', closeModal);
+
+  // 모달 뒷배경 클릭 시 닫기
+  termsModal.addEventListener('click', (e) => {
+    if (e.target === termsModal) {
+      closeModal();
+    }
+  });
+
+  // 탭 버튼 클릭 이벤트 연결
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchTab(btn.dataset.tab);
+    });
+  });
+
+  // ==============================================
   // 🚀 초기화: 앱 시작!
   // ==============================================
   resizeCanvas();
