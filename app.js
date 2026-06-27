@@ -796,23 +796,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ==============================================
   // 11단계: 🔒 윤리 핵심가이드 게이트 제어 시스템
-  // 비유: 검문소의 열쇠(LocalStorage)를 확인하는 논리구조예요!
+  // 비유: 검문소의 임시 통행증(sessionStorage)을 확인하는 논리구조예요!
+  // 브라우저 탭을 닫으면 통행증이 만료되어 다음 접속 시 다시 확인해야 해요.
   // ==============================================
   const ethicsGate = document.getElementById('ethics-gate');
   const btnEthicsAgree = document.getElementById('btn-ethics-agree');
 
-  // 로컬 스토리지에 동의 내역이 있는지 확인
-  const isEthicsApproved = localStorage.getItem('ethics-approved');
+  // 세션 스토리지에 동의 내역이 있는지 확인
+  const isEthicsApproved = sessionStorage.getItem('ethics-approved');
 
   if (isEthicsApproved === 'true') {
-    // 이미 동의했다면 오버레이를 감춤
+    // 세션 중에 이미 동의했다면 오버레이를 감춤
     ethicsGate.classList.add('hidden');
   }
 
   // 동의 서약 버튼 클릭 이벤트 핸들러
   btnEthicsAgree.addEventListener('click', () => {
-    // 로컬 스토리지에 서약 기록 저장 (영구 보관)
-    localStorage.setItem('ethics-approved', 'true');
+    // 세션 스토리지에 서약 기록 저장 (브라우저 창 닫을 때까지 유지)
+    sessionStorage.setItem('ethics-approved', 'true');
     
     // 오버레이에 hidden 클래스를 넣어 슬라이드 아웃 애니메이션 실행
     ethicsGate.classList.add('hidden');
