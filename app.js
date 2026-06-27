@@ -14,8 +14,152 @@
    - 줌 = 좌표계 전체의 배율(scale) 조절
    =================================================== */
 
+/* ===================================================
+   🔐 포털 접근 토큰 검증 게이트 (Daily Token)
+   
+   이 앱은 Edu-Portal을 통해서만 접근할 수 있습니다.
+   직접 URL 접속 시 접근 차단 화면이 표시됩니다.
+   
+   작동 원리:
+   1. URL 파라미터에서 token 값 추출
+   2. 오늘 날짜 + 비밀키로 기대 토큰 계산
+   3. 일치하면 sessionStorage에 저장 후 허용
+   4. 불일치이고 세션도 없으면 → 차단 화면 표시
+   =================================================== */
+const PORTAL_SECRET_KEY = 'SJH-EDU-PORTAL-2026-MINDMAP'; // ⚠️ 포털과 동일한 키 유지 필수!
+
+async function generateExpectedToken() {
+  const today = new Date().toLocaleDateString('ko-KR', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    timeZone: 'Asia/Seoul'
+  }).replace(/\. /g, '-').replace('.', ''); // "2026-06-27" 형식
+  const data = PORTAL_SECRET_KEY + ':' + today;
+  const encoder = new TextEncoder();
+  const buffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+  const hashArray = Array.from(new Uint8Array(buffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+}
+
+function showAccessDenied() {
+  document.body.innerHTML = `
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0d1117;
+        font-family: 'Pretendard Variable', 'Noto Sans KR', sans-serif;
+        color: #e6edf3;
+      }
+      .denied-card {
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 20px;
+        padding: 3rem 2.5rem;
+        max-width: 480px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      }
+      .denied-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        display: block;
+      }
+      .denied-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #f85149;
+        margin-bottom: 1rem;
+      }
+      .denied-desc {
+        font-size: 0.95rem;
+        color: #8b949e;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+      }
+      .denied-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(248,81,73,0.1);
+        border: 1px solid rgba(248,81,73,0.3);
+        border-radius: 50px;
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        color: #f85149;
+        margin-bottom: 2rem;
+      }
+      .denied-btn {
+        display: inline-block;
+        background: linear-gradient(135deg, #6e40c9, #a855f7);
+        color: white;
+        text-decoration: none;
+        padding: 0.8rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: opacity 0.2s;
+      }
+      .denied-btn:hover { opacity: 0.85; }
+      .denied-footer {
+        margin-top: 2rem;
+        font-size: 0.75rem;
+        color: #484f58;
+      }
+    </style>
+    <div class="denied-card">
+      <span class="denied-icon">🔒</span>
+      <h1 class="denied-title">접근이 제한된 페이지입니다</h1>
+      <p class="denied-desc">
+        이 학습 앱은 <strong>Edu-Portal(학습용 웹앱 통합 포털)</strong>을 통해서만 접속할 수 있습니다.<br>
+        직접 URL 입력이나 북마크를 통한 접근은 허용되지 않습니다.
+      </p>
+      <div class="denied-badge">
+        ⚠️ 유효한 접근 토큰이 없거나 만료되었습니다
+      </div>
+      <br>
+      <a class="denied-btn" href="javascript:history.back()">← 이전 페이지로 돌아가기</a>
+      <p class="denied-footer">
+        문의: 선정고등학교 탁제형 교사 | 02-3156-1553
+      </p>
+    </div>
+  `;
+}
+
+// 비동기 토큰 검증 (DOMContentLoaded 이전에 실행)
+(async () => {
+  const SESSION_KEY = 'portal-access-verified';
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get('token');
+  const urlFrom = params.get('from');
+
+  // 1) 이미 이 세션에서 검증됐으면 바로 통과 (앱 내 페이지 이동 시)
+  if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+    return; // 허용
+  }
+
+  // 2) URL에 토큰이 있으면 검증
+  if (urlToken && urlFrom === 'edu-portal') {
+    const expectedToken = await generateExpectedToken();
+    if (urlToken === expectedToken) {
+      // ✅ 토큰 일치: 세션에 저장하고 URL 파라미터 제거 (히스토리에 토큰 노출 방지)
+      sessionStorage.setItem(SESSION_KEY, 'true');
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, '', cleanUrl);
+      return; // 허용
+    }
+  }
+
+  // 3) 토큰 없거나 불일치 → 차단 화면
+  showAccessDenied();
+})();
+
 /* ---- 앱 전체가 로드되면 시작! ---- */
 document.addEventListener('DOMContentLoaded', () => {
+
 
   // ==============================================
   // 1단계: 캔버스 설정 (도화지 준비)
